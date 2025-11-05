@@ -3,6 +3,7 @@ package atlasledger.app;
 import atlasledger.repository.OrderRepository;
 import atlasledger.repository.ProductRepository;
 import atlasledger.repository.ProviderRepository;
+import atlasledger.service.AnalyticsService;
 import atlasledger.service.DatabaseIntegrityService;
 import atlasledger.service.ReportService;
 import atlasledger.service.SyncService;
@@ -17,6 +18,7 @@ public class AppContext {
     private final SyncService syncService;
     private final ReportService reportService;
     private final DatabaseIntegrityService databaseIntegrityService;
+    private final AnalyticsService analyticsService;
     private final NetworkUtils networkUtils;
 
     public AppContext(AppConfig config,
@@ -26,6 +28,7 @@ public class AppContext {
                       SyncService syncService,
                       ReportService reportService,
                       DatabaseIntegrityService databaseIntegrityService,
+                      AnalyticsService analyticsService,
                       NetworkUtils networkUtils) {
         this.config = config;
         this.productRepository = productRepository;
@@ -34,6 +37,7 @@ public class AppContext {
         this.syncService = syncService;
         this.reportService = reportService;
         this.databaseIntegrityService = databaseIntegrityService;
+        this.analyticsService = analyticsService;
         this.networkUtils = networkUtils;
     }
 
@@ -63,6 +67,10 @@ public class AppContext {
 
     public DatabaseIntegrityService getDatabaseIntegrityService() {
         return databaseIntegrityService;
+    }
+
+    public AnalyticsService getAnalyticsService() {
+        return analyticsService;
     }
 
     public NetworkUtils getNetworkUtils() {

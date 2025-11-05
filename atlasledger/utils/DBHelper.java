@@ -1,5 +1,8 @@
 package atlasledger.utils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,7 +11,8 @@ import java.sql.Statement;
 public final class DBHelper {
 
     private static final String DB_NAME = "atlasledger.db";
-    private static final String URL = "jdbc:sqlite:" + DB_NAME;
+    private static final Path DB_PATH = Paths.get(System.getProperty("user.home"), ".atlasledger", DB_NAME);
+    private static final String URL = "jdbc:sqlite:" + DB_PATH.toString().replace("\\", "/");
 
     static {
         initialise();
@@ -18,6 +22,14 @@ public final class DBHelper {
     }
 
     private static void initialise() {
+        try {
+            Files.createDirectories(DB_PATH.getParent());
+            Class.forName("org.sqlite.JDBC");
+        } catch (Exception e) {
+            Logger.error(DBHelper.class, "Error preparando el driver SQLite", e);
+            return;
+        }
+
         try (Connection conn = DriverManager.getConnection(URL)) {
             conn.createStatement().execute("PRAGMA foreign_keys = ON;");
             createTables(conn);
@@ -84,6 +96,15 @@ public final class DBHelper {
                     intentos INTEGER DEFAULT 0,
                     ultimo_intento TEXT,
                     creado_en TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            """);
+            statement.addBatch("""
+                CREATE TABLE IF NOT EXISTS app_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    level TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 );
             """);
             statement.executeBatch();

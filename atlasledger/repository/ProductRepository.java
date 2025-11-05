@@ -22,4 +22,8 @@ public class ProductRepository {
     public void deleteById(int id) {
         ProductoDao.eliminar(id);
     }
+
+    public void deleteByCode(String codigo) {
+        ProductoDao.buscarPorCodigo(codigo).ifPresent(producto -> ProductoDao.eliminar(producto.getId()));
+    }
 }

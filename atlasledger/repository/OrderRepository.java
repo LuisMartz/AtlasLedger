@@ -22,4 +22,8 @@ public class OrderRepository {
     public void deleteById(int id) {
         OrdenDao.eliminar(id);
     }
+
+    public void deleteByCode(String codigo) {
+        OrdenDao.buscarPorCodigo(codigo).ifPresent(orden -> OrdenDao.eliminar(orden.getId()));
+    }
 }

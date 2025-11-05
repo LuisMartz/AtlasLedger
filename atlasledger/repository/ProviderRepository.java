@@ -22,4 +22,8 @@ public class ProviderRepository {
     public void deleteById(int id) {
         ProveedorDao.eliminar(id);
     }
+
+    public void deleteByCode(String codigo) {
+        ProveedorDao.buscarPorCodigo(codigo).ifPresent(proveedor -> ProveedorDao.eliminar(proveedor.getId()));
+    }
 }

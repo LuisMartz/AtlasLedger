@@ -3,6 +3,7 @@ package atlasledger.app;
 import atlasledger.repository.OrderRepository;
 import atlasledger.repository.ProductRepository;
 import atlasledger.repository.ProviderRepository;
+import atlasledger.service.AnalyticsService;
 import atlasledger.service.DatabaseIntegrityService;
 import atlasledger.service.ReportService;
 import atlasledger.service.SyncService;
@@ -31,6 +32,7 @@ public final class AppInitializer {
 
         ReportService reportService = new ReportService(productRepository, orderRepository);
         DatabaseIntegrityService integrityService = new DatabaseIntegrityService();
+        AnalyticsService analyticsService = new AnalyticsService();
 
         return new AppContext(
             config,
@@ -40,6 +42,7 @@ public final class AppInitializer {
             syncService,
             reportService,
             integrityService,
+            analyticsService,
             networkUtils
         );
     }
