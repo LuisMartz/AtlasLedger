@@ -299,6 +299,38 @@
     -fx-font-size: 13px;
 }
 
+.login-root {
+    -fx-padding: 40;
+    -fx-alignment: center;
+}
+
+.login-card {
+    -fx-background-color: rgba(255, 255, 255, 0.96);
+    -fx-background-radius: 24;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 43, 0.18), 28, 0.4, 0, 14);
+    -fx-max-width: 480;
+}
+
+.login-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #27344b;
+}
+
+.login-subtitle {
+    -fx-text-fill: #6c7a96;
+    -fx-font-size: 13px;
+}
+
+.login-mode-box .radio-button {
+    -fx-text-fill: #3c4d6c;
+}
+
+.login-message {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+}
+
 /* Animations */
 .fade-in {
     -fx-opacity: 0;

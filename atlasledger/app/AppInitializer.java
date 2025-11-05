@@ -1,21 +1,31 @@
+
 package atlasledger.app;
 
 import atlasledger.repository.OrderRepository;
 import atlasledger.repository.ProductRepository;
 import atlasledger.repository.ProviderRepository;
 import atlasledger.service.AnalyticsService;
+import atlasledger.service.AuthService;
 import atlasledger.service.DatabaseIntegrityService;
+import atlasledger.service.DocumentService;
 import atlasledger.service.ReportService;
 import atlasledger.service.SyncService;
+import atlasledger.utils.DBHelper;
 import atlasledger.utils.NetworkUtils;
+import java.nio.file.Path;
+import java.time.Duration;
 
 public final class AppInitializer {
 
     private AppInitializer() {
     }
 
-    public static AppContext initialise() {
-        AppConfig config = AppConfig.loadDefault();
+    public static AppContext initialise(StartupProfile profile, AuthService authService) {
+        Path databasePath = profile.getDatabasePath();
+        DBHelper.overrideDatabasePath(databasePath, true);
+        authService.ensureDefaultAdmin();
+
+        AppConfig config = AppConfig.of(profile.getApiBaseUrl(), Duration.ofSeconds(10));
         NetworkUtils networkUtils = new NetworkUtils(config.getNetworkTimeout());
 
         ProductRepository productRepository = new ProductRepository();
@@ -33,6 +43,7 @@ public final class AppInitializer {
         ReportService reportService = new ReportService(productRepository, orderRepository);
         DatabaseIntegrityService integrityService = new DatabaseIntegrityService();
         AnalyticsService analyticsService = new AnalyticsService();
+        DocumentService documentService = new DocumentService(profile.getDocumentsPath());
 
         return new AppContext(
             config,
@@ -43,7 +54,13 @@ public final class AppInitializer {
             reportService,
             integrityService,
             analyticsService,
+            documentService,
+            authService,
+            profile.getWorker(),
+            profile.isLocalMode(),
+            profile.getDocumentsPath(),
             networkUtils
         );
     }
 }
+

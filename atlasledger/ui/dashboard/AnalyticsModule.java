@@ -3,6 +3,7 @@ package atlasledger.ui.dashboard;
 import atlasledger.app.AppContext;
 import atlasledger.model.AppLog;
 import atlasledger.service.AnalyticsService;
+import atlasledger.service.DocumentService;
 import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,15 +33,18 @@ import javafx.scene.layout.VBox;
 public class AnalyticsModule extends VBox {
 
     private final AnalyticsService analyticsService;
+    private final DocumentService documentService;
     private final PieChart inventoryChart = new PieChart();
     private final BarChart<String, Number> stockChart;
     private final LineChart<String, Number> ordersChart;
     private final BarChart<String, Number> logsChart;
     private final TableView<AppLog> logsTable = new TableView<>();
+    private final Label documentsSummary = new Label();
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "ES"));
 
     public AnalyticsModule(AppContext context) {
         this.analyticsService = context.getAnalyticsService();
+        this.documentService = context.getDocumentService();
         getStyleClass().add("module-wrapper");
         setSpacing(18);
 
@@ -100,7 +104,8 @@ public class AnalyticsModule extends VBox {
         Label logsHeader = new Label("Actividad reciente");
         logsHeader.getStyleClass().add("module-title");
 
-        VBox logsBox = new VBox(8, logsHeader, logsTable);
+        documentsSummary.getStyleClass().add("module-description");
+        VBox logsBox = new VBox(8, logsHeader, documentsSummary, logsTable);
         VBox.setVgrow(logsTable, Priority.ALWAYS);
 
         getChildren().addAll(heading, grid, toolbar, logsBox);
@@ -152,6 +157,7 @@ public class AnalyticsModule extends VBox {
         populateOrdersChart();
         populateLogsChart();
         populateLogsTable();
+        updateDocumentsSummary();
     }
 
     private void populateInventoryChart() {
@@ -201,5 +207,10 @@ public class AnalyticsModule extends VBox {
     private void populateLogsTable() {
         List<AppLog> recent = analyticsService.recentLogs(50);
         logsTable.getItems().setAll(recent);
+    }
+
+    private void updateDocumentsSummary() {
+        int pending = documentService.pendingDocuments().size();
+        documentsSummary.setText("Documentos pendientes por subir: " + pending);
     }
 }

@@ -1,6 +1,9 @@
 package atlasledger.app;
 
+import atlasledger.app.StartupProfile;
+import atlasledger.service.AuthService;
 import atlasledger.ui.dashboard.MainScreen;
+import atlasledger.ui.login.LoginScreen;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,15 +18,32 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        appContext = AppInitializer.initialise();
+        AuthService authService = new AuthService();
+        authService.ensureDefaultAdmin();
+
+        LoginScreen loginScreen = new LoginScreen(authService);
+        loginScreen.setOnAuthenticated(profile -> openMainWindow(stage, profile, authService));
+        loginScreen.setOnCancel(stage::close);
+
+        Scene loginScene = new Scene(loginScreen);
+        applyStyles(loginScene);
+        stage.setTitle("Atlas Ledger - Acceso");
+        stage.setScene(loginScene);
+        stage.setMinWidth(720);
+        stage.setMinHeight(520);
+        stage.show();
+    }
+
+    private void openMainWindow(Stage stage, StartupProfile profile, AuthService authService) {
+        appContext = AppInitializer.initialise(profile, authService);
         MainScreen mainScreen = new MainScreen(appContext);
         Scene scene = new Scene(mainScreen);
         applyStyles(scene);
-        stage.setTitle("Atlas Ledger");
+        stage.setTitle("Atlas Ledger - " + profile.getWorker().getNombre());
         stage.setMinWidth(1160);
         stage.setMinHeight(720);
         stage.setScene(scene);
-        stage.show();
+        stage.centerOnScreen();
     }
 
     private void applyStyles(Scene scene) {

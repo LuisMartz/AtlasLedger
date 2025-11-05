@@ -58,4 +58,8 @@ public final class Logger {
             persistenceEnabled = false;
         }
     }
+
+    public static void resetPersistence() {
+        persistenceEnabled = true;
+    }
 }
