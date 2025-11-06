@@ -11,8 +11,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.DoubleSummaryStatistics;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -26,57 +28,114 @@ public class ReportService {
         this.orderRepository = orderRepository;
     }
 
-    public Informe generarResumenInventario() {
+    public ReportSnapshot generarResumenInventario() {
         List<Producto> productos = productRepository.findAll();
-        DoubleSummaryStatistics statsValor = productos.stream()
-            .mapToDouble(p -> p.getPrecio() * p.getStock())
-            .summaryStatistics();
 
-        Map<String, Long> productosPorCategoria = productos.stream()
-            .collect(Collectors.groupingBy(Producto::getCategoria, Collectors.counting()));
+        double valorInventario = productos.stream().mapToDouble(p -> p.getPrecio() * p.getStock()).sum();
+        double saldoInventario = productos.stream().mapToDouble(p -> p.getCoste() * p.getStock()).sum();
+        double margenPromedio = productos.isEmpty()
+            ? 0.0
+            : productos.stream().mapToDouble(Producto::getMargen).average().orElse(0.0);
 
-        String payload = """
-            {
-              "totalProductos": %d,
-              "valorInventario": %.2f,
-              "saldoInventario": %.2f,
-              "categorias": %s
-            }
-        """.formatted(
-            productos.size(),
-            statsValor.getSum(),
-            productos.stream().mapToDouble(p -> p.getCoste() * p.getStock()).sum(),
-            productosPorCategoria
-        );
+        Map<String, Number> resumen = new LinkedHashMap<>();
+        resumen.put("Total de productos", productos.size());
+        resumen.put("Valor inventario", valorInventario);
+        resumen.put("Saldo inventario", saldoInventario);
+        resumen.put("Margen promedio", margenPromedio);
 
-        Informe informe = new Informe("Resumen Inventario", Informe.Tipo.INVENTARIO, payload);
+        Map<String, Long> categorias = productos.stream()
+            .collect(Collectors.groupingBy(p -> {
+                String categoria = p.getCategoria();
+                return categoria == null || categoria.isBlank() ? "Sin categoria" : categoria;
+            }, Collectors.counting()));
+
+        Map<String, Number> categoriasOrdenadas = categorias.entrySet().stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (a, b) -> a,
+                LinkedHashMap::new
+            ));
+
+        Informe informe = new Informe("Resumen Inventario", Informe.Tipo.INVENTARIO,
+            toJson(resumen, categoriasOrdenadas, "Categorias"));
         informe.setGeneradoEn(LocalDateTime.now());
         persistirInforme(informe);
-        return informe;
+
+        return new ReportSnapshot(informe, resumen, categoriasOrdenadas, "Participacion por categoria");
     }
 
-    public Informe generarComprasPorProveedor() {
+    public ReportSnapshot generarComprasPorProveedor() {
         List<Orden> ordenes = orderRepository.findAll();
 
-        Map<String, Double> totales = ordenes.stream()
-            .collect(Collectors.groupingBy(Orden::getProveedorCodigo, Collectors.summingDouble(Orden::getTotal)));
+        double totalComprado = ordenes.stream().mapToDouble(Orden::getTotal).sum();
+        double promedio = ordenes.isEmpty() ? 0.0 : totalComprado / ordenes.size();
 
-        String payload = """
-            {
-              "totalOrdenes": %d,
-              "totalComprado": %.2f,
-              "porProveedor": %s
-            }
-        """.formatted(
-            ordenes.size(),
-            ordenes.stream().mapToDouble(Orden::getTotal).sum(),
-            totales
-        );
+        Map<String, Number> resumen = new LinkedHashMap<>();
+        resumen.put("Total de ordenes", ordenes.size());
+        resumen.put("Total comprado", totalComprado);
+        resumen.put("Orden promedio", promedio);
 
-        Informe informe = new Informe("Compras por Proveedor", Informe.Tipo.COMPRAS, payload);
+        Map<String, Double> porProveedor = ordenes.stream()
+            .collect(Collectors.groupingBy(orden -> {
+                String proveedor = orden.getProveedorCodigo();
+                return proveedor == null || proveedor.isBlank() ? "Sin proveedor" : proveedor;
+            }, Collectors.summingDouble(Orden::getTotal)));
+
+        Map<String, Number> proveedoresOrdenados = porProveedor.entrySet().stream()
+            .sorted(Map.Entry.<String, Double>comparingByValue(Comparator.reverseOrder()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> e.getValue(),
+                (a, b) -> a,
+                LinkedHashMap::new
+            ));
+
+        Informe informe = new Informe("Compras por Proveedor", Informe.Tipo.COMPRAS,
+            toJson(resumen, proveedoresOrdenados, "Proveedores"));
         informe.setGeneradoEn(LocalDateTime.now());
         persistirInforme(informe);
-        return informe;
+
+        return new ReportSnapshot(informe, resumen, proveedoresOrdenados, "Distribucion por proveedor");
+    }
+
+    private String toJson(Map<String, Number> summary,
+                          Map<String, Number> breakdown,
+                          String breakdownLabel) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"summary\":{");
+        appendMap(sb, summary);
+        sb.append("},\"breakdownLabel\":\"").append(escape(breakdownLabel)).append("\",\"breakdown\":{");
+        appendMap(sb, breakdown);
+        sb.append("}}");
+        return sb.toString();
+    }
+
+    private void appendMap(StringBuilder sb, Map<String, Number> map) {
+        boolean first = true;
+        for (Map.Entry<String, Number> entry : map.entrySet()) {
+            if (!first) {
+                sb.append(',');
+            }
+            first = false;
+            sb.append('"').append(escape(entry.getKey())).append('"').append(':')
+                .append(formatNumber(entry.getValue()));
+        }
+    }
+
+    private String formatNumber(Number number) {
+        if (number == null) {
+            return "0";
+        }
+        if (number instanceof Integer || number instanceof Long) {
+            return String.valueOf(number.longValue());
+        }
+        return String.format(Locale.US, "%.2f", number.doubleValue());
+    }
+
+    private String escape(String value) {
+        return value.replace("\"", "\\\"");
     }
 
     private void persistirInforme(Informe informe) {

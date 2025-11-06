@@ -18,6 +18,15 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        showLogin(stage);
+    }
+
+    private void showLogin(Stage stage) {
+        if (appContext != null) {
+            appContext.getSyncService().close();
+            appContext = null;
+        }
+
         AuthService authService = new AuthService();
         authService.ensureDefaultAdmin();
 
@@ -31,12 +40,17 @@ public class MainApp extends Application {
         stage.setScene(loginScene);
         stage.setMinWidth(720);
         stage.setMinHeight(520);
+        stage.centerOnScreen();
         stage.show();
     }
 
     private void openMainWindow(Stage stage, StartupProfile profile, AuthService authService) {
+        if (appContext != null) {
+            appContext.getSyncService().close();
+        }
         appContext = AppInitializer.initialise(profile, authService);
-        MainScreen mainScreen = new MainScreen(appContext);
+        Runnable logoutHandler = () -> showLogin(stage);
+        MainScreen mainScreen = new MainScreen(appContext, logoutHandler);
         Scene scene = new Scene(mainScreen);
         applyStyles(scene);
         stage.setTitle("Atlas Ledger - " + profile.getWorker().getNombre());

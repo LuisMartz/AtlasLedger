@@ -69,6 +69,34 @@
     -fx-padding: 0 0 16 0;
 }
 
+.sidebar-user-card {
+    -fx-alignment: center;
+    -fx-spacing: 6;
+    -fx-padding: 12 0 18 0;
+}
+
+.avatar-circle {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 600;
+    -fx-alignment: center;
+    -fx-pref-width: 64;
+    -fx-pref-height: 64;
+    -fx-background-radius: 50;
+    -fx-font-size: 20px;
+}
+
+.sidebar-user-name {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.sidebar-user-role {
+    -fx-text-fill: rgba(255, 255, 255, 0.65);
+    -fx-font-size: 11px;
+}
+
 .nav-button {
     -fx-background-color: transparent;
     -fx-text-fill: rgba(255, 255, 255, 0.65);
@@ -96,6 +124,18 @@
     -fx-text-fill: #ffffff;
     -fx-font-weight: 600;
     -fx-effect: dropshadow(gaussian, rgba(15, 23, 43, 0.35), 18, 0.4, 0, 4);
+}
+
+.button-logout {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.button-logout:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Content area */
@@ -297,6 +337,19 @@
     -fx-padding: 18;
     -fx-font-family: "Consolas", "Courier New", monospace;
     -fx-font-size: 13px;
+    -fx-control-inner-background: rgba(14, 24, 44, 0.92);
+    -fx-highlight-fill: rgba(74, 159, 255, 0.3);
+    -fx-highlight-text-fill: #1e2733;
+}
+
+.report-output .content {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e8efff;
+}
+
+.report-output .scroll-pane,
+.report-output .viewport {
+    -fx-background-color: transparent;
 }
 
 .login-root {
@@ -329,6 +382,21 @@
 .login-message {
     -fx-text-fill: #e74c3c;
     -fx-font-size: 12px;
+}
+
+.report-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #27344b;
+}
+
+.status-label {
+    -fx-text-fill: #6c7a96;
+    -fx-font-size: 12px;
+}
+
+.status-label.error {
+    -fx-text-fill: #e74c3c;
 }
 
 /* Animations */
