@@ -56,6 +56,8 @@ public class MainApp extends Application {
         stage.setTitle("Atlas Ledger - " + profile.getWorker().getNombre());
         stage.setMinWidth(1160);
         stage.setMinHeight(720);
+        stage.setWidth(1280);
+        stage.setHeight(820);
         stage.setScene(scene);
         stage.centerOnScreen();
     }

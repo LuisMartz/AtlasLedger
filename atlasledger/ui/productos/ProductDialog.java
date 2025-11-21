@@ -1,12 +1,15 @@
 package atlasledger.ui.productos;
 
 import atlasledger.model.Producto;
-import java.util.Objects;
+import atlasledger.model.Proveedor;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -17,15 +20,24 @@ public class ProductDialog extends Dialog<Producto> {
     private final TextField codigoField = new TextField();
     private final TextField nombreField = new TextField();
     private final TextField categoriaField = new TextField();
-    private final TextField proveedorField = new TextField();
+    private final ComboBox<String> proveedorCombo;
     private final TextField stockField = new TextField();
     private final TextField costeField = new TextField();
     private final TextField precioField = new TextField();
 
-    public ProductDialog(Producto existing) {
+    public ProductDialog(Producto existing, List<Proveedor> proveedores) {
         boolean editing = existing != null;
         setTitle(editing ? "Editar producto" : "Nuevo producto");
         setHeaderText(editing ? "Actualiza los datos del producto." : "Introduce los datos del nuevo producto.");
+
+        proveedorCombo = new ComboBox<>();
+        proveedorCombo.getItems().setAll(
+            proveedores.stream()
+                .map(Proveedor::getCodigo)
+                .sorted()
+                .collect(Collectors.toList())
+        );
+        proveedorCombo.setPromptText(proveedores.isEmpty() ? "Sin proveedores" : "Selecciona proveedor");
 
         ButtonType saveType = new ButtonType(editing ? "Guardar" : "Crear", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(saveType, ButtonType.CANCEL);
@@ -46,7 +58,7 @@ public class ProductDialog extends Dialog<Producto> {
                 producto.setCodigo(codigoField.getText().trim());
                 producto.setNombre(nombreField.getText().trim());
                 producto.setCategoria(categoriaField.getText().trim());
-                producto.setProveedorCodigo(proveedorField.getText().trim());
+                producto.setProveedorCodigo(Optional.ofNullable(proveedorCombo.getValue()).orElse("").trim());
                 producto.setStock(parseInt(stockField.getText(), existing != null ? existing.getStock() : 0));
                 producto.setCoste(parseDouble(costeField.getText(), existing != null ? existing.getCoste() : 0.0));
                 producto.setPrecio(parseDouble(precioField.getText(), existing != null ? existing.getPrecio() : 0.0));
@@ -73,7 +85,7 @@ public class ProductDialog extends Dialog<Producto> {
         grid.add(categoriaField, 1, row++);
 
         grid.add(new Label("Proveedor"), 0, row);
-        grid.add(proveedorField, 1, row++);
+        grid.add(proveedorCombo, 1, row++);
 
         grid.add(new Label("Stock"), 0, row);
         grid.add(stockField, 1, row++);
@@ -97,7 +109,7 @@ public class ProductDialog extends Dialog<Producto> {
             codigoField.setDisable(true);
             nombreField.setText(existing.getNombre());
             categoriaField.setText(Optional.ofNullable(existing.getCategoria()).orElse(""));
-            proveedorField.setText(Optional.ofNullable(existing.getProveedorCodigo()).orElse(""));
+            proveedorCombo.getSelectionModel().select(Optional.ofNullable(existing.getProveedorCodigo()).orElse(""));
             stockField.setText(String.valueOf(existing.getStock()));
             costeField.setText(String.valueOf(existing.getCoste()));
             precioField.setText(String.valueOf(existing.getPrecio()));

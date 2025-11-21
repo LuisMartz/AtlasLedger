@@ -60,6 +60,7 @@ public class MainScreen extends BorderPane {
     private final Map<Button, String> navMapping = new LinkedHashMap<>();
     private Button activeNavButton;
     private final Runnable logoutHandler;
+    private String activeModule = "Productos";
 
     public MainScreen(AppContext context, Runnable logoutHandler) {
         this.context = context;
@@ -79,6 +80,9 @@ public class MainScreen extends BorderPane {
         moduleSuppliers.put("Ordenes", () -> new OrderModule(context));
         moduleSuppliers.put("Informes", () -> new ReportModule(context));
         moduleSuppliers.put("Analitica", () -> new AnalyticsModule(context));
+        moduleSuppliers.put("Trading", () -> new atlasledger.ui.trading.TradingModule(context));
+        moduleSuppliers.put("Empaquetado", () -> new atlasledger.ui.packaging.PackagingModule(context));
+        moduleSuppliers.put("Transporte", () -> new atlasledger.ui.transport.TransportModule(context));
     }
 
     private VBox buildSidebar() {
@@ -193,6 +197,7 @@ public class MainScreen extends BorderPane {
 
         subtitle.setText(subtitleFor(name));
         updateNavigationState(name);
+        activeModule = name;
     }
 
     private void updateNavigationState(String activeName) {
@@ -214,6 +219,9 @@ public class MainScreen extends BorderPane {
             case "Ordenes" -> "Supervisa el ciclo de compras y trazabilidad de pedidos.";
             case "Informes" -> "Genera reportes clave para la toma de decisiones.";
             case "Analitica" -> "Visualiza el rendimiento operativo y la bitacora del sistema.";
+            case "Trading" -> "Monitorea la variacion de precios simulada.";
+            case "Empaquetado" -> "Configura modos de transporte y costos logísticos.";
+            case "Transporte" -> "Simula fases de envio hasta el cliente final.";
             default -> "Selecciona un modulo para comenzar.";
         };
     }
@@ -225,6 +233,9 @@ public class MainScreen extends BorderPane {
             case "Ordenes" -> "\uD83D\uDCE6";
             case "Informes" -> "\uD83D\uDCC8";
             case "Analitica" -> "\uD83D\uDCCA";
+            case "Trading" -> "\uD83D\uDCB5";
+            case "Empaquetado" -> "\uD83D\uDCE9";
+            case "Transporte" -> "\u2708";
             default -> "\u25A1";
         };
     }
@@ -245,7 +256,7 @@ public class MainScreen extends BorderPane {
         Label nameLabel = new Label(name);
         nameLabel.getStyleClass().add("sidebar-user-name");
 
-        Label roleLabel = new Label(role + " · " + mode);
+        Label roleLabel = new Label(role + " - " + mode);
         roleLabel.getStyleClass().add("sidebar-user-role");
 
         VBox card = new VBox(4, avatar, nameLabel, roleLabel);
@@ -276,5 +287,11 @@ public class MainScreen extends BorderPane {
             alert.setContentText(String.join("\n", issues));
         }
         alert.showAndWait();
+    }
+
+    public void reloadAfterSimulation() {
+        contentArea.getChildren().clear();
+        moduleCache.clear();
+        activateModule(activeModule);
     }
 }

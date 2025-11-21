@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 
 public class ProductModule extends BorderPane {
 
+    private final AppContext context;
     private final ProductRepository productRepository;
     private final SyncService syncService;
     private final ObservableList<Producto> data;
@@ -41,6 +42,7 @@ public class ProductModule extends BorderPane {
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("es", "ES"));
 
     public ProductModule(AppContext context) {
+        this.context = context;
         this.productRepository = context.getProductRepository();
         this.syncService = context.getSyncService();
 
@@ -189,7 +191,7 @@ public class ProductModule extends BorderPane {
     }
 
     private void openDialog(Producto producto) {
-        ProductDialog dialog = new ProductDialog(producto);
+        ProductDialog dialog = new ProductDialog(producto, context.getProviderRepository().findAll());
         dialog.initOwner(getScene().getWindow());
         Optional<Producto> result = dialog.showAndWait();
         result.ifPresent(updated -> {

@@ -9,6 +9,7 @@ import atlasledger.service.AuthService;
 import atlasledger.service.DatabaseIntegrityService;
 import atlasledger.service.DocumentService;
 import atlasledger.service.ReportService;
+import atlasledger.service.SimulationService;
 import atlasledger.service.SyncService;
 import atlasledger.utils.NetworkUtils;
 import java.nio.file.Path;
@@ -58,6 +59,7 @@ public class AppContext {
     private final AnalyticsService analyticsService;
     private final DocumentService documentService;
     private final AuthService authService;
+    private final SimulationService simulationService;
     private final Worker worker;
     private final boolean localMode;
     private final Path documentsPath;
@@ -73,6 +75,7 @@ public class AppContext {
                       AnalyticsService analyticsService,
                       DocumentService documentService,
                       AuthService authService,
+                      SimulationService simulationService,
                       Worker worker,
                       boolean localMode,
                       Path documentsPath,
@@ -87,6 +90,7 @@ public class AppContext {
         this.analyticsService = analyticsService;
         this.documentService = documentService;
         this.authService = authService;
+        this.simulationService = simulationService;
         this.worker = worker;
         this.localMode = localMode;
         this.documentsPath = documentsPath;
@@ -131,6 +135,10 @@ public class AppContext {
 
     public AuthService getAuthService() {
         return authService;
+    }
+
+    public SimulationService getSimulationService() {
+        return simulationService;
     }
 
     public Worker getWorker() {

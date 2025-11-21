@@ -9,6 +9,7 @@ import atlasledger.service.AuthService;
 import atlasledger.service.DatabaseIntegrityService;
 import atlasledger.service.DocumentService;
 import atlasledger.service.ReportService;
+import atlasledger.service.SimulationService;
 import atlasledger.service.SyncService;
 import atlasledger.utils.DBHelper;
 import atlasledger.utils.NetworkUtils;
@@ -44,6 +45,7 @@ public final class AppInitializer {
         DatabaseIntegrityService integrityService = new DatabaseIntegrityService();
         AnalyticsService analyticsService = new AnalyticsService();
         DocumentService documentService = new DocumentService(profile.getDocumentsPath());
+        SimulationService simulationService = new SimulationService(productRepository, providerRepository, orderRepository);
 
         return new AppContext(
             config,
@@ -56,6 +58,7 @@ public final class AppInitializer {
             analyticsService,
             documentService,
             authService,
+            simulationService,
             profile.getWorker(),
             profile.isLocalMode(),
             profile.getDocumentsPath(),

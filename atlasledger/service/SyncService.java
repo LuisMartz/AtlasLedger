@@ -64,10 +64,10 @@ import java.util.function.Consumer;
  *
  * <p>Constructor parameters:
  * <ul>
- *   <li>{@code apiBaseUrl} — base URL of the remote API; a trailing slash is normalized away.</li>
- *   <li>{@code productRepository}, {@code providerRepository}, {@code orderRepository} — local repositories
+ *   <li>{@code apiBaseUrl} ??? base URL of the remote API; a trailing slash is normalized away.</li>
+ *   <li>{@code productRepository}, {@code providerRepository}, {@code orderRepository} ??? local repositories
  *       used to persist pulled entities.</li>
- *   <li>{@code networkUtils} — provides connectivity checks, timeout values, JSON parsing and mapping helpers.</li>
+ *   <li>{@code networkUtils} ??? provides connectivity checks, timeout values, JSON parsing and mapping helpers.</li>
  * </ul>
  *
  * <p>Threading and lifecycle:
@@ -293,3 +293,4 @@ public class SyncService implements AutoCloseable {
     private record QueuedChange(int id, String entidad, String referencia, String payload, SyncOperation operacion) {
     }
 }
+
