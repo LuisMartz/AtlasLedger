@@ -27,6 +27,72 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+/**
+ * Service responsible for synchronizing local domain changes with a remote HTTP API and for pulling
+ * remote updates into local repositories.
+ *
+ * <p>Primary responsibilities:
+ * <ul>
+ *   <li>Enqueue local changes to a persistent outgoing queue (sync_queue table).</li>
+ *   <li>Push pending queued changes to a remote endpoint ({@code apiBaseUrl}/sync/{entity}).</li>
+ *   <li>Pull remote entity lists (productos, proveedores, ordenes) and update local repositories.</li>
+ *   <li>Track attempts and completion state for queued items in the database.</li>
+ * </ul>
+ *
+ * <p>Behavior and guarantees:
+ * <ul>
+ *   <li>The service persists outgoing changes via {@link #enqueueChange(String, String, String, SyncOperation)}.
+ *       The expected DB table columns used are: {@code entidad}, {@code referencia}, {@code payload},
+ *       {@code operacion}, {@code estado}, {@code creado_en}, {@code ultimo_intento} and {@code intentos}.</li>
+ *   <li>{@link #pushPendingAsync(java.util.function.Consumer)} schedules a background task on an internal
+ *       single-threaded {@code ExecutorService} and invokes the optional callback when finished. The callback
+ *       receives {@code true} when the background task completed without throwing; {@code false} when an
+ *       exception occurred or the operation decided not to run (e.g. offline). Note: a {@code true} callback
+ *       value indicates the task ran successfully, not that every queued item was successfully delivered.</li>
+ *   <li>{@link #pushPendingInternal()} performs the actual delivery of up to 25 oldest PENDING queue entries.
+ *       It verifies network connectivity first and returns {@code false} if offline. For each queued entry it
+ *       attempts an HTTP POST to {@code apiBaseUrl + "/sync/" + entidad}. On HTTP success the entry is marked
+ *       DONE and attempts are incremented; on failure only the attempt counter and timestamp are updated.</li>
+ *   <li>{@link #pullUpdates()} requests remote lists for the entities "productos", "proveedores" and "ordenes",
+ *       maps the received JSON payloads to domain objects via {@code NetworkUtils} mapping helpers, and saves
+ *       them into the provided repositories. If offline the pull is skipped.</li>
+ *   <li>Database and network errors are logged; methods generally swallow exceptions and do not propagate them.</li>
+ *   <li>The internal {@link java.net.http.HttpClient} is constructed with {@code networkUtils.defaultTimeout()}
+ *       and uses the same single-threaded executor; call {@link #close()} to shut down the executor when the
+ *       service is no longer needed.</li>
+ * </ul>
+ *
+ * <p>Constructor parameters:
+ * <ul>
+ *   <li>{@code apiBaseUrl} — base URL of the remote API; a trailing slash is normalized away.</li>
+ *   <li>{@code productRepository}, {@code providerRepository}, {@code orderRepository} — local repositories
+ *       used to persist pulled entities.</li>
+ *   <li>{@code networkUtils} — provides connectivity checks, timeout values, JSON parsing and mapping helpers.</li>
+ * </ul>
+ *
+ * <p>Threading and lifecycle:
+ * <ul>
+ *   <li>Uses a dedicated single-threaded {@link java.util.concurrent.ExecutorService} for background tasks and
+ *       as the {@link java.net.http.HttpClient} executor.</li>
+ *   <li>{@link #close()} performs {@code executor.shutdownNow()} to release resources. After calling close the
+ *       service should not be used for further network activity.</li>
+ * </ul>
+ *
+ * <p>Record:
+ * <ul>
+ *   <li>Inner record {@code QueuedChange(int id, String entidad, String referencia, String payload, SyncOperation operacion)}
+ *       represents a row loaded from the sync_queue table that is pending delivery.</li>
+ * </ul>
+ *
+ * <p>Notes and assumptions:
+ * <ul>
+ *   <li>The implementation expects a helper {@code DBHelper.getConnection()} to obtain JDBC connections.</li>
+ *   <li>The format of JSON payloads and the mapping behavior are delegated to {@code NetworkUtils}.</li>
+ *   <li>This service focuses on "at-least-once" delivery semantics: failed deliveries increment retry
+ *       counters and are retried later; duplicate handling (idempotency) must be enforced by the remote API
+ *       or by payload design if required.</li>
+ * </ul>
+ */
 public class SyncService implements AutoCloseable {
 
     public enum SyncOperation {

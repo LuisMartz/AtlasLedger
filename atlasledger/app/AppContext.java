@@ -13,6 +13,39 @@ import atlasledger.service.SyncService;
 import atlasledger.utils.NetworkUtils;
 import java.nio.file.Path;
 
+/**
+ * The {@code AppContext} class serves as a centralized container for application-wide
+ * configuration and service dependencies. It encapsulates references to various repositories,
+ * services, configuration objects, and utility classes required throughout the application.
+ * <p>
+ * This class is typically instantiated at application startup and passed to components
+ * that require access to shared resources or services.
+ * </p>
+ *
+ * <p>
+ * The dependencies managed by {@code AppContext} include:
+ * <ul>
+ *   <li>{@link AppConfig} - Application configuration settings</li>
+ *   <li>{@link ProductRepository} - Repository for product data access</li>
+ *   <li>{@link ProviderRepository} - Repository for provider data access</li>
+ *   <li>{@link OrderRepository} - Repository for order data access</li>
+ *   <li>{@link SyncService} - Service for data synchronization</li>
+ *   <li>{@link ReportService} - Service for generating reports</li>
+ *   <li>{@link DatabaseIntegrityService} - Service for database integrity checks</li>
+ *   <li>{@link AnalyticsService} - Service for analytics and metrics</li>
+ *   <li>{@link DocumentService} - Service for document management</li>
+ *   <li>{@link AuthService} - Service for authentication and authorization</li>
+ *   <li>{@link Worker} - Background worker for asynchronous tasks</li>
+ *   <li>{@code boolean localMode} - Flag indicating if the application is running in local mode</li>
+ *   <li>{@link java.nio.file.Path} documentsPath - Path to the documents directory</li>
+ *   <li>{@link NetworkUtils} - Utility class for network operations</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * All dependencies are injected via the constructor and exposed through getter methods.
+ * </p>
+ */
 public class AppContext {
 
     private final AppConfig config;

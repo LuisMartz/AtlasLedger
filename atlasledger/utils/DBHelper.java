@@ -10,6 +10,34 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Utility class for managing the SQLite database connection and schema initialization for the AtlasLedger application.
+ * <p>
+ * This class handles:
+ * <ul>
+ *   <li>Setting up the database file location and JDBC URL.</li>
+ *   <li>Initializing the database schema, including tables and indexes.</li>
+ *   <li>Executing an optional initialization SQL script on first run or when the database path is overridden.</li>
+ *   <li>Providing a method to obtain a JDBC {@link Connection} to the database.</li>
+ * </ul>
+ * <p>
+ * The database path can be overridden at runtime, and the schema will be (re)initialized as needed.
+ * <p>
+ * This class is not intended to be instantiated.
+ *
+ * <h2>Thread Safety</h2>
+ * All public methods are thread-safe.
+ *
+ * <h2>Usage Example</h2>
+ * <pre>
+ * try (Connection conn = DBHelper.getConnection()) {
+ *     // Use the connection
+ * }
+ * </pre>
+ *
+ * @author LuisMartz
+ * @since 1.0
+ */
 public final class DBHelper {
 
     private static final String DB_NAME = "atlasledger.db";

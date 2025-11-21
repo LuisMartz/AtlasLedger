@@ -27,6 +27,33 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+/**
+ * LoginScreen is a JavaFX UI component that provides a login interface for Atlas Ledger.
+ * <p>
+ * It allows users to authenticate using either a local/temporary mode or a central server mode.
+ * The screen includes fields for username, password, database file selection, and documents directory selection.
+ * It also provides options to browse for database files and document directories.
+ * </p>
+ *
+ * <ul>
+ *   <li>Supports switching between local and central server modes.</li>
+ *   <li>Handles authentication via an injected AuthService.</li>
+ *   <li>Allows configuration of database and documents paths.</li>
+ *   <li>Displays messages for authentication errors or missing input.</li>
+ *   <li>Notifies listeners upon successful authentication or cancellation.</li>
+ * </ul>
+ *
+ * <p>
+ * Usage:
+ * <ul>
+ *   <li>Set listeners using {@link #setOnAuthenticated(Consumer)} and {@link #setOnCancel(Runnable)}.</li>
+ *   <li>Embed this component in a JavaFX scene.</li>
+ * </ul>
+ * </p>
+ *
+ * @author LuisMartz
+ * @version 1.0
+ */
 public class LoginScreen extends BorderPane {
 
     private static final Path CENTRAL_DB_PATH = Paths.get(System.getProperty("user.home"), ".atlasledger", "atlasledger.db");

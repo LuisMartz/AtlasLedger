@@ -25,6 +25,34 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * ReportModule is a JavaFX UI component that provides an interface for generating and displaying executive reports.
+ * <p>
+ * This module allows users to:
+ * <ul>
+ *   <li>Generate different types of reports using the provided {@link ReportService}.</li>
+ *   <li>View summary statistics and breakdowns in both textual and graphical (PieChart) formats.</li>
+ *   <li>Copy the generated report content to the clipboard for sharing.</li>
+ *   <li>See status updates and loading indicators during report generation.</li>
+ * </ul>
+ * 
+ * <b>Features:</b>
+ * <ul>
+ *   <li>Buttons for generating inventory summary and purchases by supplier reports.</li>
+ *   <li>Displays summary statistics as cards and breakdowns as a pie chart.</li>
+ *   <li>Shows report metadata, formatted JSON output, and status messages.</li>
+ *   <li>Handles loading states and error feedback.</li>
+ * </ul>
+ * 
+ * <b>Usage:</b>
+ * <pre>
+ *     ReportModule reportModule = new ReportModule(appContext);
+ *     // Add reportModule to your scene graph
+ * </pre>
+ * 
+ * @author LuisMartz    
+ * @since 1.0
+ */
 public class ReportModule extends BorderPane {
 
     private final ReportService reportService;

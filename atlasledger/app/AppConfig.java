@@ -2,6 +2,22 @@ package atlasledger.app;
 
 import java.time.Duration;
 
+/**
+ * Configuration class for application settings such as API base URL and network timeout.
+ * <p>
+ * This class provides immutable configuration values required for connecting to external services.
+ * It includes factory methods for loading default settings or creating custom configurations.
+ * </p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ *     AppConfig config = AppConfig.loadDefault();
+ *     String baseUrl = config.getApiBaseUrl();
+ *     Duration timeout = config.getNetworkTimeout();
+ * </pre>
+ *
+ * @author [Your Name]
+ */
 public class AppConfig {
 
     private final String apiBaseUrl;

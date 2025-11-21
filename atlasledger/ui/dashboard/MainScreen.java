@@ -28,6 +28,28 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+/**
+ * MainScreen is the primary UI container for the Atlas Ledger application dashboard.
+ * <p>
+ * It provides a sidebar for navigation between different modules (Productos, Proveedores,
+ * Ordenes, Informes, Analitica), a header with global actions (data integrity check,
+ * synchronization), and a central content area where the selected module is displayed.
+ * </p>
+ * <p>
+ * Features:
+ * <ul>
+ *   <li>Sidebar navigation with module icons and tooltips</li>
+ *   <li>User card displaying current user's name, role, and mode (local/server)</li>
+ *   <li>Header with application title, subtitle, and action buttons</li>
+ *   <li>Animated transitions between modules</li>
+ *   <li>Logout functionality and database integrity validation</li>
+ *   <li>Module content caching for performance</li>
+ * </ul>
+ * </p>
+ *
+ * @author  LuisMartz
+ * @version 1.0
+ */
 public class MainScreen extends BorderPane {
 
     private final AppContext context;
