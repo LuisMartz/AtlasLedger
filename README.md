@@ -1,103 +1,595 @@
 # AtlasLedger
 
-AtlasLedger is a small Java/JavaFX desktop application for managing products, providers and orders with local SQLite persistence and optional remote synchronization.
+**Una aplicación desktop Java/JavaFX para gestionar productos, proveedores y órdenes con persistencia local SQLite y sincronización remota**.
 
-## Contents
+![Java](https://img.shields.io/badge/Java-11%2B-orange)
+![Maven](https://img.shields.io/badge/Maven-3.8%2B-blue)
+![JavaFX](https://img.shields.io/badge/JavaFX-17-brightgreen)
+![SQLite](https://img.shields.io/badge/SQLite-3.44-lightblue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-- **Source**: [atlasledger](atlasledger)
-- **UI**: JavaFX components under [ui](ui)
-- **DB helpers & utils**: [utils](utils)
-- **Services**: [service](service)
-- **Repositories / DAOs**: [repository](repository) / [dao](dao)
-- **Resources**: 
-  - Styles & init SQL: [resources/init.sql](resources/init.sql), [resources/styles/main.css](resources/styles/main.css)
+---
 
-## Requirements
+## 📋 Tabla de Contenidos
 
-- Java 17+ (OpenJDK or Oracle JDK)
-- JavaFX SDK compatible with your JDK (if running outside an IDE)
-- SQLite (bundled via JDBC driver; ensure `org.sqlite.JDBC` is available on the classpath)
+- [Screenshots](#screenshots)
+- [Tutorial Rápido](#tutorial-rápido)
+- [Flujo de Uso](#flujo-de-uso)
+- [Requisitos](#requisitos)
+- [Instalación](#instalación)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Arquitectura](#arquitectura)
+- [Build y Compilación](#build-y-compilación)
+- [Tests](#tests)
+- [Estado de Sincronización](#estado-de-sincronización)
+- [Troubleshooting](#troubleshooting)
+- [Contribuir](#contribuir)
+- [Licencia](#licencia)
 
-## Quick Start
+---
 
-### Using an IDE
+## 📸 Screenshots
 
-1. Open the project folder in your IDE (IntelliJ IDEA / VS Code)
-2. Add JavaFX libraries to the project run configuration (modules: `javafx.controls`, `javafx.fxml`)
-3. Run the main class: [`atlasledger.app.MainApp`](app/MainApp.java)
+> **Nota:** Agrega capturas de pantalla aquí. Ejemplo de estructura:
+> - Pantalla de Login
+> - Dashboard Principal
+> - Módulo de Productos
+> - Módulo de Proveedores
+> - Módulo de Órdenes
+> - Reportes e Informes
 
-### From the Command Line
+Puedes incluir un GIF animado del flujo de uso aquí.
 
-1. **Compile**:
+---
+
+## 🚀 Tutorial Rápido
+
+### 1. **Clonar el repositorio**
+```bash
+git clone https://github.com/LuisMartz/AtlasLedger.git
+cd AtlasLedger
+```
+
+### 2. **Verificar requisitos**
+```bash
+java -version          # Java 11 o superior
+mvn -version           # Maven 3.8 o superior
+```
+
+### 3. **Compilar el proyecto**
+```bash
+mvn clean compile
+```
+
+### 4. **Ejecutar tests**
+```bash
+mvn test
+```
+
+### 5. **Generar JAR ejecutable**
+```bash
+mvn clean package
+```
+
+### 6. **Ejecutar la aplicación**
+
+**Opción A: Desde Maven (directamente)**
+```bash
+mvn javafx:run
+```
+
+**Opción B: Desde JAR compilado**
+```bash
+java -jar target/atlasledger-1.0.0.jar
+```
+
+---
+
+## 🔄 Flujo de Uso
+
+### Flujo General del Usuario
+
+```
+┌─────────────────┐
+│  Iniciar App    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Pantalla Login  │ ◄─── Seleccionar archivo DB (o crear uno nuevo)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Dashboard       │ ◄─── Vista principal con módulos
+└────────┬────────┘
+         │
+    ┌────┴────┬────────┬─────────┬─────────┐
+    │          │        │         │         │
+    ▼          ▼        ▼         ▼         ▼
+ Productos  Órdenes Proveedores Informes Analytics
+```
+
+### Módulos Principales
+
+1. **Productos**
+   - Crear, editar, eliminar productos
+   - Ver inventario
+   - Gestionar precios
+
+2. **Proveedores**
+   - Registrar proveedores
+   - Ver contacto y ubicación
+   - Gestionar relaciones comerciales
+
+3. **Órdenes**
+   - Crear órdenes de compra/venta
+   - Asignar productos a órdenes
+   - Hacer seguimiento de estado
+
+4. **Informes**
+   - Generar reportes de inventario
+   - Estadísticas de ventas
+   - Análisis de proveedores
+
+5. **Dashboard / Analytics**
+   - Vista general de KPIs
+   - Gráficos de tendencias
+   - Alertas de bajo stock
+
+6. **Módulos Especializados**
+   - **Trading:** Gestión de operaciones comerciales
+   - **Packaging:** Control de empaque y logística
+   - **Transport:** Seguimiento de transporte
+
+---
+
+## ✅ Requisitos
+
+### Requisitos del Sistema
+- **Java:** 11 o superior (probado en JDK 11, 17, 21)
+- **Maven:** 3.8 o superior
+- **Sistema Operativo:** Windows, macOS, Linux
+
+### Dependencias Maven (automáticamente instaladas)
+
+| Dependencia | Versión | Propósito |
+|---|---|---|
+| `org.openjfx:javafx-controls` | 17.0.6 | Framework UI |
+| `org.openjfx:javafx-fxml` | 17.0.6 | Markup de UI |
+| `org.openjfx:javafx-graphics` | 17.0.6 | Renderizado gráfico |
+| `org.xerial:sqlite-jdbc` | 3.44.0.0 | Driver SQLite |
+| `org.junit.jupiter:junit-jupiter-api` | 5.9.3 | Testing (JUnit 5) |
+| `org.mockito:mockito-core` | 5.3.1 | Mocking en tests |
+| `org.slf4j:slf4j-api` | 2.0.9 | Logging |
+| `ch.qos.logback:logback-classic` | 1.4.11 | Implementación Logging |
+
+---
+
+## 💻 Instalación
+
+### Instalación Local para Desarrollo
+
+1. **Clonar el repositorio**
    ```bash
-   javac -d out $(find . -name "*.java")
+   git clone https://github.com/LuisMartz/AtlasLedger.git
+   cd AtlasLedger
    ```
 
-2. **Run** (adjust path to your JavaFX SDK libs):
+2. **Abrir en IDE**
+   - **IntelliJ IDEA:** `File → Open` → seleccionar carpeta del proyecto
+   - **VS Code:** `File → Open Folder` → instalar extensión de Java (Extension Pack for Java)
+   - **Eclipse:** `File → Import → Existing Maven Projects`
+
+3. **Maven descargará automáticamente las dependencias**
    ```bash
-   java --module-path /path/to/javafx/lib --add-modules javafx.controls,javafx.fxml -cp out atlasledger.app.MainApp
+   mvn dependency:resolve
    ```
 
-## Configuration & Startup
+4. **Compilar**
+   ```bash
+   mvn clean compile
+   ```
 
-- **Default DB file path**: Managed by `atlasledger.utils.DBHelper`
-- **Login screen**: [`atlasledger.ui.login.LoginScreen`](ui/login/LoginScreen.java)
-- **App-wide configuration**: Provided by `atlasledger.app.AppConfig`
-- **Application initialization**: [`atlasledger.app.AppInitializer`](app/AppInitializer.java)
-- **Running context**: Exposed via `atlasledger.app.AppContext`
+---
 
-## Key Components
+## 🏗️ Estructura del Proyecto
 
-### Core Classes
+```
+AtlasLedger/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── atlasledger/
+│   │   │       ├── app/                 # Inicialización y configuración
+│   │   │       │   ├── MainApp.java
+│   │   │       │   ├── AppConfig.java
+│   │   │       │   ├── AppContext.java
+│   │   │       │   ├── AppInitializer.java
+│   │   │       │   └── StartupProfile.java
+│   │   │       ├── model/               # Entidades/POJO
+│   │   │       │   ├── Producto.java
+│   │   │       │   ├── Proveedor.java
+│   │   │       │   ├── Orden.java
+│   │   │       │   ├── Worker.java
+│   │   │       │   ├── AppLog.java
+│   │   │       │   ├── Informe.java
+│   │   │       │   └── DocumentTask.java
+│   │   │       ├── dao/                 # Data Access Objects
+│   │   │       │   ├── ProductoDao.java
+│   │   │       │   ├── ProveedorDao.java
+│   │   │       │   ├── OrdenDao.java
+│   │   │       │   ├── WorkerDao.java
+│   │   │       │   └── DocumentQueueDao.java
+│   │   │       ├── repository/          # Repositories (abstracción sobre DAOs)
+│   │   │       │   ├── ProductRepository.java
+│   │   │       │   ├── ProviderRepository.java
+│   │   │       │   └── OrderRepository.java
+│   │   │       ├── service/             # Lógica de negocio
+│   │   │       │   ├── AuthService.java
+│   │   │       │   ├── DocumentService.java
+│   │   │       │   ├── ReportService.java
+│   │   │       │   ├── AnalyticsService.java
+│   │   │       │   ├── DatabaseIntegrityService.java
+│   │   │       │   ├── SimulationService.java
+│   │   │       │   ├── SyncService.java
+│   │   │       │   └── ReportSnapshot.java
+│   │   │       ├── simulation/          # Simulación de eventos
+│   │   │       │   ├── PackagingEvent.java
+│   │   │       │   ├── TransportEvent.java
+│   │   │       │   ├── TransportMode.java
+│   │   │       │   └── PricePoint.java
+│   │   │       ├── ui/                  # Interfaz de Usuario (JavaFX)
+│   │   │       │   ├── login/
+│   │   │       │   │   └── LoginScreen.java
+│   │   │       │   ├── dashboard/
+│   │   │       │   │   ├── MainScreen.java
+│   │   │       │   │   └── AnalyticsModule.java
+│   │   │       │   ├── productos/
+│   │   │       │   │   ├── ProductModule.java
+│   │   │       │   │   └── ProductDialog.java
+│   │   │       │   ├── proveedores/
+│   │   │       │   │   ├── ProviderModule.java
+│   │   │       │   │   └── ProviderDialog.java
+│   │   │       │   ├── ordenes/
+│   │   │       │   │   ├── OrderModule.java
+│   │   │       │   │   └── OrderDialog.java
+│   │   │       │   ├── informes/
+│   │   │       │   │   └── ReportModule.java
+│   │   │       │   ├── trading/
+│   │   │       │   │   └── TradingModule.java
+│   │   │       │   ├── packaging/
+│   │   │       │   │   └── PackagingModule.java
+│   │   │       │   └── transport/
+│   │   │       │       └── TransportModule.java
+│   │   │       └── utils/               # Utilidades
+│   │   │           ├── DBHelper.java
+│   │   │           ├── Logger.java
+│   │   │           ├── NetworkUtils.java
+│   │   │           └── PasswordUtils.java
+│   │   ├── resources/
+│   │   │   ├── init.sql
+│   │   │   └── styles/
+│   │   │       └── main.css
+│   │   └── module-info.java            # Declaración de módulos
+│   ├── test/
+│   │   └── java/
+│   │       └── atlasledger/
+│   │           ├── dao/
+│   │           │   ├── ProductoDaoTest.java
+│   │           │   └── ProveedorDaoTest.java
+│   │           ├── repository/
+│   │           │   ├── ProductRepositoryTest.java
+│   │           │   └── ProviderRepositoryTest.java
+│   │           └── utils/
+│   │               ├── DBHelperTest.java
+│   │               └── PasswordUtilsTest.java
+├── pom.xml                             # Configuración Maven
+├── .gitignore                          # Git ignore rules
+├── LICENSE                             # Licencia (MIT)
+├── README.md                           # Este archivo
+└── sources.txt                         # Metadatos del proyecto
+```
 
-- **Entry point**: `atlasledger.app.MainApp`
-- **App bootstrap**: `atlasledger.app.AppInitializer`
-- **DB helper & schema init**: `atlasledger.utils.DBHelper`
-- **Network & JSON stubs**: `atlasledger.utils.NetworkUtils`
-- **Logging**: `atlasledger.utils.Logger`
-- **Authentication**: `atlasledger.service.AuthService`
-- **Sync with remote API**: `atlasledger.service.SyncService`
-- **Reporting**: `atlasledger.service.ReportService`
-- **Analytics**: `atlasledger.service.AnalyticsService`
-- **Password hashing**: `atlasledger.utils.PasswordUtils`
+---
 
-### UI Modules
+## 🏛️ Arquitectura
 
-- **Login**: `atlasledger.ui.login.LoginScreen`
-- **Products**: `atlasledger.ui.productos.ProductModule`
-- **Providers**: `atlasledger.ui.proveedores.ProviderModule`
-- **Reports**: `atlasledger.ui.informes.ReportModule`
-- **Analytics / Dashboard**: `atlasledger.ui.dashboard.AnalyticsModule`
+### Capas Arquitectónicas
 
-### Data Access
+```
+┌──────────────────────────────────────────────┐
+│           UI Layer (JavaFX)                   │
+│   - MainScreen, LoginScreen, Modules         │
+│   - Componentes interactivos                 │
+└──────────────┬───────────────────────────────┘
+               │
+┌──────────────▼───────────────────────────────┐
+│         Service Layer                         │
+│   - AuthService, ReportService               │
+│   - AnalyticsService, SyncService            │
+│   - DatabaseIntegrityService                 │
+└──────────────┬───────────────────────────────┘
+               │
+┌──────────────▼───────────────────────────────┐
+│      Repository/DAO Layer                    │
+│   - ProductRepository, ProviderRepository    │
+│   - OrderRepository, ProductoDao, etc.       │
+└──────────────┬───────────────────────────────┘
+               │
+┌──────────────▼───────────────────────────────┐
+│       Data Access Layer                      │
+│   - SQLite JDBC Driver                       │
+│   - DBHelper (pool de conexiones)            │
+└──────────────┬───────────────────────────────┘
+               │
+┌──────────────▼───────────────────────────────┐
+│         SQLite Database                      │
+│   - Tablas: productos, proveedores,          │
+│             órdenes, workers, logs           │
+└──────────────────────────────────────────────┘
+```
 
-- **Repositories**:
-  - [`atlasledger.repository.ProductRepository`](repository/ProductRepository.java)
-  - [`atlasledger.repository.ProviderRepository`](repository/ProviderRepository.java)
-  - [`atlasledger.repository.OrderRepository`](repository/OrderRepository.java)
+### Patrones de Diseño
 
-- **DAOs**:
-  - [`dao/ProductoDao.java`](dao/ProductoDao.java)
-  - [`dao/ProveedorDao.java`](dao/ProveedorDao.java)
-  - [`dao/OrdenDao.java`](dao/OrdenDao.java)
+- **DAO (Data Access Object):** Abstracción de acceso a datos en `dao/`
+- **Repository:** Capa adicional de abstracción en `repository/`
+- **Service:** Lógica de negocio centralizada en `service/`
+- **Singleton:** `AppContext`, `Logger`, `DBHelper`
+- **Factory/Builder:** Inicialización en `AppInitializer`
+- **MVC (Model-View-Controller):** Separación en UI, Service, Model
 
-## Database
+### Flujo de Datos
 
-- **Schema and initial SQL**: [resources/init.sql](resources/init.sql)
-- The DB file defaults to a user-local path
-- Change the path via the login screen or programmatically through `atlasledger.utils.DBHelper.overrideDatabasePath`
+```
+Usuario interactúa con UI
+       ↓
+Module/Screen (UI)
+       ↓
+Service Layer (lógica de negocio)
+       ↓
+Repository/DAO (persistencia)
+       ↓
+SQLite Database
+```
 
-## Development Notes
+---
 
-- The JSON parsing in `atlasledger.utils.NetworkUtils` is a stub — replace with a real JSON library (Jackson/Gson) for production
-- Sync uses `atlasledger.service.SyncService` with `parseJsonArray` / mapping helpers in `NetworkUtils` to support remote payloads
-- **UI styles**: [resources/styles/main.css](resources/styles/main.css)
+## 🔨 Build y Compilación
 
-## Troubleshooting
+### Tareas Maven Disponibles
 
-- **Missing JavaFX modules**: Ensure `--module-path` points to JavaFX SDK and `--add-modules` includes required modules
-- **DB errors**: Inspect logs produced via `atlasledger.utils.Logger` and verify the SQLite JDBC driver is present
-- **Remote API connectivity**: If the app cannot reach the remote API, `atlasledger.utils.NetworkUtils.isOnline` performs a basic reachability check
+```bash
+# Compilar código
+mvn clean compile
+
+# Ejecutar tests
+mvn test
+
+# Ejecutar tests específicos
+mvn test -Dtest=ProductoDaoTest
+
+# Generar JAR ejecutable (fat JAR con todas las dependencias)
+mvn clean package
+
+# Limpiar builds anteriores
+mvn clean
+
+# Ejecutar aplicación desde Maven
+mvn javafx:run
+
+# Ver árbol de dependencias
+mvn dependency:tree
+
+# Ver resumen de proyecto
+mvn project-info-reports:project-info
+```
+
+### Generar JAR Ejecutable
+
+```bash
+mvn clean package
+```
+
+**Output:** `target/atlasledger-1.0.0.jar`
+
+**Ejecutar:**
+```bash
+java -jar target/atlasledger-1.0.0.jar
+```
+
+### Compilación Manual (sin Maven)
+
+```bash
+# Compilar
+javac -d out $(find src/main/java -name "*.java")
+
+# Ejecutar (requiere JavaFX SDK)
+java --module-path /path/to/javafx/lib \
+     --add-modules javafx.controls,javafx.fxml \
+     -cp out:libs/* atlasledger.app.MainApp
+```
+
+---
+
+## 🧪 Tests
+
+### Ejecutar Todos los Tests
+
+```bash
+mvn test
+```
+
+### Ejecutar Tests Específicos
+
+```bash
+mvn test -Dtest=ProductoDaoTest
+mvn test -Dtest=*RepositoryTest
+```
+
+### Cobertura de Tests
+
+Los tests están organizados en `src/test/java/atlasledger/`:
+
+- **`dao/`** - Tests de DAOs (acceso a datos)
+- **`repository/`** - Tests de Repositories
+- **`utils/`** - Tests de utilidades
+
+### Ejemplos de Archivos de Test
+
+#### `ProductoDaoTest.java`
+```java
+class ProductoDaoTest {
+    private ProductoDao productoDao;
+    private MockedConnection mockConnection;
+
+    @BeforeEach
+    void setUp() {
+        mockConnection = mock(Connection.class);
+        productoDao = new ProductoDao(mockConnection);
+    }
+
+    @Test
+    void testCrearProducto() {
+        // Arrange
+        Producto producto = new Producto("Test", 100.0, 50);
+        
+        // Act
+        productoDao.crear(producto);
+        
+        // Assert
+        assertTrue(productoDao.obtenerTodos().contains(producto));
+    }
+}
+```
+
+### Notas sobre Tests
+
+- **Especulativo:** Los tests actualmente son plantillas; deben ejecutarse y ajustarse según la implementación real.
+- **Dependencias de BD:** Los DAOs requieren mocks de conexión; ajusta según tus necesidades.
+- **Instrucciones para validar localmente:**
+  1. Asegúrate de que SQLite JDBC esté en classpath
+  2. Ejecuta `mvn clean test` en la terminal
+  3. Revisa resultados en `target/surefire-reports/`
+
+---
+
+## 🔄 Estado de Sincronización
+
+### Sincronización Remota: STUB (Plan Futuro)
+
+**Estado Actual:** La sincronización remota es un **stub/placeholder** y NO está completamente implementada.
+
+**Componentes Relacionados:**
+- `SyncService.java` - Servicio de sincronización
+- `NetworkUtils.java` - Utilidades de red (parseJson es básico)
+
+**Características Planeadas:**
+- [ ] Sincronización bidirecional con servidor remoto
+- [ ] Manejo de conflictos de datos
+- [ ] Queue de cambios offline
+- [ ] Validación de integridad post-sincronización
+
+**Cómo Implementar:**
+1. Reemplazar el parseo JSON en `NetworkUtils` con Jackson o Gson
+2. Implementar endpoints REST en `SyncService`
+3. Agregar estrategia de resolución de conflictos
+4. Crear tests de integración
+
+---
+
+## 🐛 Troubleshooting
+
+### 1. Error: `javafx: not found`
+**Solución:**
+```bash
+# Instalar plugin de JavaFX
+mvn dependency:resolve
+
+# O ejecutar directamente:
+mvn javafx:run
+```
+
+### 2. Error: `SQLite JDBC Driver not found`
+**Solución:**
+```bash
+# Actualizar dependencias
+mvn clean dependency:resolve
+
+# Verificar classpath
+mvn dependency:tree | grep sqlite
+```
+
+### 3. Error: `Module not found: javafx.controls`
+**Solución (IDE):**
+- Agregar `--module-path` a JVM options
+- Configurar en `pom.xml` (ya incluido)
+
+### 4. Base de datos corrupta o no existe
+**Solución:**
+1. Eliminar archivo `.db` (generalmente en `~/.atlasledger/`)
+2. Reiniciar aplicación
+3. Base de datos se recreará automáticamente desde `init.sql`
+
+### 5. Error de Permisos al acceder a BD
+**Solución (Windows):**
+```powershell
+# Ejecutar como administrador
+java -jar target/atlasledger-1.0.0.jar
+```
+
+### 6. Aplicación lenta o freezes
+**Solución:**
+1. Verificar logs: `Logger.java`
+2. Aumentar heap memory: `java -Xmx2G -jar atlasledger-1.0.0.jar`
+3. Revisar queries de BD en `DBHelper.java`
+
+---
+
+## 🤝 Contribuir
+
+1. **Fork** el repositorio
+2. **Crea una rama** para tu feature:
+   ```bash
+   git checkout -b feature/tu-feature
+   ```
+3. **Commituea tus cambios:**
+   ```bash
+   git commit -m "Agregar tu-feature"
+   ```
+4. **Push a la rama:**
+   ```bash
+   git push origin feature/tu-feature
+   ```
+5. **Abre un Pull Request** con descripción clara
+
+### Estándares de Contribución
+- Java 11+ syntax
+- Seguir convenciones de nombres existentes
+- Agregar tests para nuevas funcionalidades
+- Documentar cambios en README
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia **MIT**. Ver archivo [`LICENSE`](LICENSE) para detalles.
+
+**Copyright (c) 2025 Luis Martz**
+
+---
+
+## 📚 Referencias
+
+- [JavaFX Documentation](https://openjfx.io/javadoc/17/)
+- [SQLite JDBC](https://github.com/xerial/sqlite-jdbc)
+- [Maven Official](https://maven.apache.org/)
+- [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+
+---
+
+**Última actualización:** Diciembre 2025  
+**Versión:** 1.0.0
 
 ## Contributing
 

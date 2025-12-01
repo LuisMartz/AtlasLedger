@@ -2,5 +2,14 @@
   "java.project.referencedLibraries": [
     "C:/Program Files/Java/javafx-sdk-21.0.9/lib/*.jar",
     "libs/**/*.jar"
-  ]
+  ],
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.configuration.maven.defaultMojoExecutionAction": "ignore",
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.formatOnSave": true
+  },
+  "maven.view": "hierarchical",
+  "maven.terminal.useJavaHome": true
 }

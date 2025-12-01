@@ -16,7 +16,7 @@ import java.time.Duration;
  *     Duration timeout = config.getNetworkTimeout();
  * </pre>
  *
- * @author [Your Name]
+ * @author LuisMartz
  */
 public class AppConfig {
 
