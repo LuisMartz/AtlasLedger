@@ -182,12 +182,20 @@ public class MainScreen extends BorderPane {
     private void activateModule(String name) {
         Node module = moduleCache.computeIfAbsent(name, key -> moduleSuppliers.get(key).get());
         if (!contentArea.getChildren().contains(module)) {
-            module.setOpacity(0);
             contentArea.getChildren().add(module);
         }
+        contentArea.getChildren().forEach(node -> {
+            boolean active = node == module;
+            node.setVisible(active);
+            node.setManaged(active);
+            if (active) {
+                node.toFront();
+            }
+        });
+
         module.setCache(true);
         module.setCacheHint(CacheHint.SPEED);
-        module.toFront();
+        module.setOpacity(0);
 
         FadeTransition fade = new FadeTransition(Duration.millis(160), module);
         fade.setInterpolator(Interpolator.EASE_BOTH);

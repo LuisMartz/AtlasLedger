@@ -63,12 +63,12 @@ public class MainApp extends Application {
     }
 
     private void applyStyles(Scene scene) {
-        URL css = MainApp.class.getResource("/atlasledger/resources/styles/main.css");
+        URL css = MainApp.class.getResource("/styles/main.css");
         if (css != null) {
             scene.getStylesheets().add(css.toExternalForm());
             return;
         }
-        Path cssPath = Paths.get("atlasledger", "resources", "styles", "main.css");
+        Path cssPath = Paths.get("src", "main", "resources", "styles", "main.css");
         if (Files.exists(cssPath)) {
             scene.getStylesheets().add(cssPath.toUri().toString());
         }
