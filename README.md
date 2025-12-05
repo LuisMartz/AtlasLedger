@@ -30,7 +30,6 @@
 
 ## 📸 Screenshots
 
-> **Nota:** Agrega capturas de pantalla aquí. Ejemplo de estructura:
 > - Pantalla de Login
 > - Dashboard Principal
 > - Módulo de Productos
@@ -38,7 +37,6 @@
 > - Módulo de Órdenes
 > - Reportes e Informes
 
-Puedes incluir un GIF animado del flujo de uso aquí.
 
 ---
 
